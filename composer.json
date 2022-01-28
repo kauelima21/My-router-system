@@ -1,0 +1,12 @@
+{
+    "name": "kaue/express-php",
+    "autoload": {
+        "psr-4": {
+            "Express\\": "src/"
+        },
+        "files": [
+            "src/Config/Helpers.php",
+            "src/Config/Config.php"
+        ]
+    }
+}
