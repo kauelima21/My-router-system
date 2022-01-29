@@ -22,6 +22,9 @@ class Router
     /** @var string */
     private $separator;
 
+    /** @var array */
+    private $args;
+
     /** @var string */
     private static $namespace;
 
@@ -31,10 +34,19 @@ class Router
         $this->request = new Request();
         $this->response = new Response();
         $this->route = (substr($baseUrl, -1) == "/" ? rtrim($baseUrl, "/") : $baseUrl) . $this->request->getUri();
+        $this->args = [];
     }
 
     private function addRoute(string $httpMethod, string $route, $handler)
     {
+        $patternRoute = "/{(.*?)}/";
+        // prepara o padrão para a troca da variável
+        if (preg_match_all($patternRoute, $route, $matches)) {
+            $route = preg_replace($patternRoute, "(.*)", $route);
+        }
+
+        $this->args = $matches[1];
+
         $this->routes[$route] = [
             "httpMethod" => $httpMethod,
             "route" => $route,
@@ -56,10 +68,27 @@ class Router
 
     public function run()
     {
-        $route = $this->routes[$this->request->getUri()] ?? [];
-        // Isso aqui não tá legal não mano kkkkkkkkk
+        foreach ($this->routes as $patternRoute) {
+            if (preg_match_all("~" . $patternRoute["route"] . "~", $this->request->getUri(), $matches)) {
+                $route = $patternRoute;
+                unset($matches[0]);
+                //$this->args = array_merge($this->args, $matches);
+                foreach ($matches as $key => $value) {
+                    $matches[$key] = $value[0];
+                }
+
+                $route["args"] = array_values($matches);
+                foreach ($this->args as $key => $value) {
+                    $route["args"][$value] = $route["args"][$key];
+                    unset($route["args"][$key]);
+                }
+            } else {
+                $route = $this->routes[$this->request->getUri()];
+            }
+        }
+
         if ($route["handler"] instanceof \Closure) {
-            call_user_func($route["handler"], $this->request, $this->response, array_merge($route["args"], $this->request->getQueryParams()));
+            call_user_func($route["handler"], $this->request, $this->response, $route["args"]);
             return;
         }
 
@@ -69,6 +98,9 @@ class Router
         if (class_exists($controller) && method_exists($controller, $method)) {
             $myController = new $controller;
             $myController->$method($this->request, $this->response, $route["args"]);
+            return;
         }
+
+        //Erro de falta de controlador/método
     }
 }
