@@ -12,7 +12,8 @@ $router->get("/api/{term}", function ($req, $res, $args) {
     var_dump($args);
 });
 $router->get("/users/{id}/{status}", function ($req, $res, $args) {
-    var_dump($args);
+    $res->type("application/json");
+    $res->send(json_encode(["id" => $args["id"], "status" => $args["status"]]));
 });
 
 $router->run();
