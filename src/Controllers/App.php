@@ -8,4 +8,9 @@ class App
     {
         echo "Home";
     }
+
+    public function about()
+    {
+        echo "Sobre nós";
+    }
 }

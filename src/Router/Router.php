@@ -8,6 +8,9 @@ use Express\Router\Http\Response;
 class Router
 {
     /** @var string */
+    private $patch;
+
+    /** @var array */
     private $route;
 
     /** @var array */
@@ -22,18 +25,15 @@ class Router
     /** @var string */
     private $separator;
 
-    /** @var array */
-    private $args;
-
     /** @var string */
     private static $namespace;
 
-    public function __construct(string $baseUrl, $separator)
+    public function __construct(string $separator = ":")
     {
         $this->separator = $separator;
         $this->request = new Request();
         $this->response = new Response();
-        $this->route = (substr($baseUrl, -1) == "/" ? rtrim($baseUrl, "/") : $baseUrl) . $this->request->getUri();
+        $this->patch = (filter_input(INPUT_GET, "route", FILTER_DEFAULT) ?? "/");
         $this->args = [];
     }
 
@@ -45,14 +45,12 @@ class Router
             $route = preg_replace($patternRoute, "(.*)", $route);
         }
 
-        $this->args = $matches[1];
-
-        $this->routes[$route] = [
+        $this->routes[$httpMethod][$route] = [
             "httpMethod" => $httpMethod,
             "route" => $route,
             "handler" => (!is_string($handler) ? $handler : strstr($handler, $this->separator, true)),
             "method" => (!is_string($handler) ? : str_replace($this->separator, "", strstr($handler, $this->separator))),
-            "args" => []
+            "args" => $matches[1]
         ];
     }
 
@@ -68,24 +66,7 @@ class Router
 
     public function run()
     {
-        foreach ($this->routes as $patternRoute) {
-            if (preg_match_all("~" . $patternRoute["route"] . "~", $this->request->getUri(), $matches)) {
-                $route = $patternRoute;
-                unset($matches[0]);
-                //$this->args = array_merge($this->args, $matches);
-                foreach ($matches as $key => $value) {
-                    $matches[$key] = $value[0];
-                }
-
-                $route["args"] = array_values($matches);
-                foreach ($this->args as $key => $value) {
-                    $route["args"][$value] = $route["args"][$key];
-                    unset($route["args"][$key]);
-                }
-            } else {
-                $route = $this->routes[$this->request->getUri()];
-            }
-        }
+        $route = $this->getRoute();
 
         if ($route["handler"] instanceof \Closure) {
             call_user_func($route["handler"], $this->request, $this->response, $route["args"]);
@@ -102,5 +83,42 @@ class Router
         }
 
         //Erro de falta de controlador/método
+    }
+
+    private function parseRoute(array $route)
+    {
+        if (!empty($this->route)) {
+            return;
+        }
+
+        if ($route["route"] === $this->patch) {
+            $this->route = $route;
+            return;
+        }
+
+        if (strpos($route["route"], "(.*)") && preg_match_all("~" . $route["route"] . "~", $this->patch, $matches)) {
+            unset($matches[0]);
+            $this->route = $route;
+            $this->route["args"] = array_combine($this->route["args"], $this->parseMatches($matches));
+            return;
+        }
+    }
+
+    private function getRoute(): array
+    {
+        foreach ($this->routes[$this->request->getMethod()] as $route) {
+            $this->parseRoute($route);
+        }
+
+        return $this->route;
+    }
+
+    private function parseMatches(array $array)
+    {
+        foreach ($array as $key => $value) {
+            $array[$key] = $value[0];
+        }
+
+        return $array;
     }
 }
