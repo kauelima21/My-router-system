@@ -36,6 +36,11 @@ class Request
         return $this->queryParams;
     }
 
+    public function getPostVars()
+    {
+        return $this->postVars;
+    }
+
     public function getHeaders()
     {
         return $this->headers;

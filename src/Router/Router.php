@@ -13,8 +13,14 @@ class Router
     /** @var array */
     private $route;
 
+    /** @var string */
+    private $projectURL;
+
     /** @var array */
     private $routes;
+
+    /** @var null|int */
+    private $error;
 
     /** @var Request */
     private $request;
@@ -28,8 +34,9 @@ class Router
     /** @var string */
     private static $namespace;
 
-    public function __construct(string $separator = ":")
+    public function __construct(string $projectURL, string $separator = ":")
     {
+        $this->projectURL = (substr($projectURL, "-1") == "/" ? substr($projectURL, 0, -1) : $projectURL);
         $this->separator = $separator;
         $this->request = new Request();
         $this->response = new Response();
@@ -59,6 +66,11 @@ class Router
         return $this->addRoute("GET", $route, $handler);
     }
 
+    public function post(string $route, $handler)
+    {
+        return $this->addRoute("POST", $route, $handler);
+    }
+
     public function namespace(string $namespace)
     {
         self::$namespace = $namespace;
@@ -68,6 +80,11 @@ class Router
     {
         $route = $this->getRoute();
 
+        if (empty($route)) {
+            $this->error = 404;
+            return;
+        }
+
         if ($route["handler"] instanceof \Closure) {
             call_user_func($route["handler"], $this->request, $this->response, $route["args"]);
             return;
@@ -76,11 +93,15 @@ class Router
         $controller = self::$namespace . "\\" . $route["handler"];
         $method = $route["method"];
         
-        if (class_exists($controller) && method_exists($controller, $method)) {
+        if (class_exists($controller)) {
             $myController = new $controller;
-            $myController->$method($this->request, $this->response, $route["args"]);
+            (method_exists($controller, $method) ? $myController->$method($this->request, $this->response, $route["args"]) : $this->error = 405);
+            
             return;
         }
+
+        $this->error = 400;
+        return;
 
         //Erro de falta de controlador/método
     }
@@ -104,7 +125,7 @@ class Router
         }
     }
 
-    private function getRoute(): array
+    private function getRoute(): ?array
     {
         foreach ($this->routes[$this->request->getMethod()] as $route) {
             $this->parseRoute($route);
@@ -120,5 +141,21 @@ class Router
         }
 
         return $array;
+    }
+
+    public function redirect(string $route, int $statusCode)
+    {
+        if (filter_var($route, FILTER_VALIDATE_URL)) {
+            header("Location: {$route}");
+            exit;
+        }
+
+        $route = (substr($route, 0, 1) == "/" ? $route : "/{$route}");
+        header("Location: {$this->projectURL}{$route}");
+    }
+
+    public function error()
+    {
+        return $this->error;
     }
 }

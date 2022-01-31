@@ -4,7 +4,7 @@ namespace Express\Controllers;
 
 class App
 {
-    public function home()
+    public function home($req)
     {
         echo "Home";
     }

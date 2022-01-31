@@ -35,7 +35,7 @@ class Response
         return $this;
     }
 
-    public function set($key, $value)
+    public function addHeader($key, $value)
     {
         $this->headers[$key] = $value;
     }
