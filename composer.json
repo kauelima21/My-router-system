@@ -1,12 +1,25 @@
 {
-    "name": "kaue/express-php",
+    "name": "Kaue/Router",
+    "description": "My own php route system.",
+    "keywords": [
+        "MVC",
+        "Router",
+        "Route",
+        "Routes"
+    ],
+    "authors": [
+    {
+        "name": "Kauê Leal de Lima",
+        "email": "kaueslim@outlook.com",
+        "role": "Developer"
+    }
+    ],
+    "require": {
+        "php": ">=7.2"
+    },
     "autoload": {
         "psr-4": {
-            "Express\\": "src/"
-        },
-        "files": [
-            "src/Config/Helpers.php",
-            "src/Config/Config.php"
-        ]
+            "Kaue\\Router\\": "src/"
+        }
     }
 }

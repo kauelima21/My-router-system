@@ -13,6 +13,9 @@ class Router
     /** @var array */
     private $route;
 
+    /** @var null|string */
+    private $group;
+
     /** @var string */
     private $projectURL;
 
@@ -42,6 +45,7 @@ class Router
         $this->response = new Response();
         $this->patch = (filter_input(INPUT_GET, "route", FILTER_DEFAULT) ?? "/");
         $this->args = [];
+        $this->group = null;
     }
 
     private function addRoute(string $httpMethod, string $route, $handler)
@@ -54,11 +58,16 @@ class Router
 
         $this->routes[$httpMethod][$route] = [
             "httpMethod" => $httpMethod,
-            "route" => $route,
+            "route" => $this->group . $route,
             "handler" => (!is_string($handler) ? $handler : strstr($handler, $this->separator, true)),
             "method" => (!is_string($handler) ? : str_replace($this->separator, "", strstr($handler, $this->separator))),
             "args" => $matches[1]
         ];
+    }
+
+    public function group(?string $group)
+    {
+        $this->group = $group;
     }
 
     public function get(string $route, $handler)

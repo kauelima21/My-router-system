@@ -28,7 +28,6 @@ class Request
     private function setUri()
     {
         $this->uri = $_SERVER["REQUEST_URI"];
-        //$this->uri = explode("?", $this->uri[0]);
     }
 
     public function getQueryParams()
