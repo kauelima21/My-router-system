@@ -1,6 +1,6 @@
 <?php
 
-namespace Express\Router\Http;
+namespace Kaue\Router\Http;
 
 class Request
 {

@@ -2,8 +2,8 @@
 
 namespace Express\Router;
 
-use Express\Router\Http\Request;
-use Express\Router\Http\Response;
+use Kaue\Router\Http\Request;
+use Kaue\Router\Http\Response;
 
 class Router
 {
