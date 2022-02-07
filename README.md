@@ -2,6 +2,18 @@
 
 I've created this to pratice router, request and response interfaces with PHP and start building projects with MVC
 
+## You will need to use a .htaccess file
+
+```
+RewriteEngine On
+Options All -Indexes
+
+# ROUTER URL Rewrite
+RewriteCond %{SCRIPT_FILENAME} !-f
+RewriteCond %{SCRIPT_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?route=/$1 [L,QSA]
+```
+
 ## Practical example
 
 ```
