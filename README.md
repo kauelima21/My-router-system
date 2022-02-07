@@ -26,7 +26,7 @@ use Express\Router\Http\Response;
 
 require __DIR__ . "/vendor/autoload.php";
 
-$router = new Router(CONF_URL_BASE, ":"); // set the url base and the separator
+$router = new Router("http://localhost", ":"); // set the url base and the separator
 $router->namespace("Express\Controllers"); //set the namespace of the Controllers
 
 // route with class controller
