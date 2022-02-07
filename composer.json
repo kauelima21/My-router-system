@@ -1,5 +1,5 @@
 {
-    "name": "Kaue/Router",
+    "name": "kaue/router",
     "description": "My own php route system.",
     "keywords": [
         "MVC",
