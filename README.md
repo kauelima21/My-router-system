@@ -33,7 +33,7 @@ $router->namespace("Express\Controllers"); //set the namespace of the Controller
 $router->get("/", "App:home"); // first the class and after the separator is the method
 
 // route with Closure controller
-$router->get("/ops/{error}", function (Request $req, Response $res, $args) use($router) {
+$router->get("/ops/{error}", function (Request $req, Response $res, $args) {
     $res->status($args["error"]) // set the status code
         ->type("text/html") // set the content-type
         ->send("ERRO: {$args["error"]}."); // the output
