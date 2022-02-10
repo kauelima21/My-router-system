@@ -2,6 +2,8 @@
 
 namespace Kaue\Router\Http;
 
+use function PHPSTORM_META\type;
+
 class Response
 {
     private $statusCode;
@@ -20,10 +22,22 @@ class Response
     {
         http_response_code($this->statusCode);
 
-        if ($this->contentType === "text/html" || $this->contentType === "application/json") {
+        echo $content;
+        
+        $this->sendHeaders();
+    }
+
+    public function json($content)
+    {
+        http_response_code($this->statusCode);
+        $this->contentType = "application/json";
+
+        if (is_array($content)) {
+            echo json_encode($content);
+        } else {
             echo $content;
-            return;
         }
+        
         $this->sendHeaders();
     }
 

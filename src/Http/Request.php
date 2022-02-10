@@ -25,6 +25,11 @@ class Request
         $this->setUri();
     }
 
+    public function body()
+    {
+        return file_get_contents("php://input");
+    }
+
     private function setUri()
     {
         $this->uri = $_SERVER["REQUEST_URI"];
