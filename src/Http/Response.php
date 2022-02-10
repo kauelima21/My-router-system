@@ -19,12 +19,12 @@ class Response
     public function send($content)
     {
         http_response_code($this->statusCode);
-        $this->sendHeaders();
 
         if ($this->contentType === "text/html" || $this->contentType === "application/json") {
             echo $content;
             return;
         }
+        $this->sendHeaders();
     }
 
     public function render() {}
