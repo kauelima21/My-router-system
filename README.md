@@ -43,7 +43,7 @@ $router->run(); // run the routes
 
 // error redirect
 if ($router->error()) {
-    $router->redirect("/ops/{$router->error()}", $router->error());
+    $router->redirect("/ops/{$router->error()}");
 }
 
 ```

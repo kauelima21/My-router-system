@@ -135,9 +135,8 @@ trait RouterTrait
         return $array;
     }
 
-    public function redirect(string $route, int $statusCode = 200)
+    public function redirect(string $route)
     {
-        http_response_code($statusCode);
         if (filter_var($route, FILTER_VALIDATE_URL)) {
             header("Location: {$route}");
             exit;
