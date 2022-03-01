@@ -2,8 +2,6 @@
 
 namespace Kaue\Router\Http;
 
-use function PHPSTORM_META\type;
-
 class Response
 {
     private $statusCode;
